@@ -1,0 +1,78 @@
+.Colors {
+  line-height:0;
+}
+.Colors-color{
+  display:inline-block;
+  height: 30px;
+  width: 30px;
+}
+
+.ColorSelector {
+  width:100%;
+  text-align:center;
+  padding:5px;
+  font-size:0;
+}
+
+.ColorSelector-btn {
+  position:relative;
+  text-align:left;
+  display: inline-block;
+  box-sizing: border-box;
+  height: 46px;
+  width: 46px;
+  padding: 6px 4px 6px 8px;
+}
+
+.isSelected.ColorSelector-btn:before {
+  font-family: FontAwesome;
+  font-size: 24px;
+  opacity: 0.8;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+  display:block;
+  position:absolute;
+  content: '\f14a';
+  color: white;
+  top:11px;
+  left:12px;
+}
+
+.ColorSelector-btn:first-child {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.ColorSelector-btn:last-child {
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.ColorSelector-allCopy {
+  position:absolute;
+  left:13px;
+  bottom:0;
+  font-size:10px;
+  text-transform: uppercase;
+  font-family:Verdana;
+}
+
+.LoadingIndicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index:100;
+  background: rgba(255,255,255,0.5);
+}
+
+.LoadingIndicator:before {
+  content: "Loading...";
+  font-size: 25px;
+  font-family: Arial;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+}

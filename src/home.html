@@ -1,0 +1,14 @@
+<a href="#" ng-click="aboutClick()">?</a>
+
+<color-selector
+  colors="colorStore.colorFilters"
+  all-selected="colorStore.allSelected"></color-selector>
+
+<div class="Colors">
+
+  <div
+    ng-repeat="color in colorStore.colors | similarColors:colorStore.selectedColors track by color.index"
+    ng-style="{backgroundColor: fcolor(color)}"
+    class="Colors-color"></div>
+
+</div>

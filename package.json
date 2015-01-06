@@ -1,0 +1,28 @@
+{
+  "name": "angular-flux-routing-example",
+  "version": "1.0.0",
+  "description": "Achieving Reasonable Scalability in Angular with Flux and Routing",
+  "main": "src/index.js",
+  "dependencies": {
+    "send": "^0.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node src/serve.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gilbox/angular-flux-routing-example.git"
+  },
+  "keywords": [
+    "angularjs",
+    "flux"
+  ],
+  "author": "Gil Birman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gilbox/angular-flux-routing-example/issues"
+  },
+  "homepage": "https://github.com/gilbox/angular-flux-routing-example"
+}
