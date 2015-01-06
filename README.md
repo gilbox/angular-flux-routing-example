@@ -35,7 +35,7 @@ it supports params the same way `ui-router` does but we don't need them for this
 
     }),
 
-then handle routing in our Action Creator *like a boss*:
+then handle routing in our Action Creator [*like a boss*](http://gifstumblr.com/images/putting-sunglasses-on-like-a-boss_863.gif):
 
     _route: function(payload) {
       if (routeStore.pathMatchesState(payload.path, 'about')) {
