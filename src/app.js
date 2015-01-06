@@ -2,80 +2,6 @@ var app = angular.module('plunker', ['ui.router']);
 
 app.constant('dispatcher', new simflux.Dispatcher());
 
-app.factory('actionCreator', function (dispatcher, colorApi, aboutApi, colorStore, routeStore) {
-  return dispatcher.registerActionCreator({
-
-    toggleColor: function(payload) {
-      dispatcher.dispatch('toggle:color', payload);
-    },
-
-    toggleAll: function() {
-      dispatcher.dispatch('toggle:all');
-    },
-
-    // This function shouldn't be called directly from the view layer
-    // All of our routing changes go through here,
-    // both internal and stream URL changes (see below)
-    _route: function(payload) {
-      if (routeStore.pathMatchesState(payload.path, 'about')) {
-
-        // whenever the 'about' route is loaded, we re-load
-        // the about data with aboutApi.
-        // This probably makes little sense in a real-world application,
-        // but contrast this to how the color data is only loaded one
-        // time in the 'home' route below
-
-        dispatcher.dispatch('loadingIndicator:show');
-
-        aboutApi.fetch().success(function(data) {
-          dispatcher.dispatch('loaded:about', {people:data});
-          dispatcher.dispatch('route', payload);
-          dispatcher.dispatch('loadingIndicator:hide');
-        });
-
-
-      } else if (routeStore.pathMatchesState(payload.path, 'home')) {
-        if (colorStore.colorsLoaded) {
-
-          // If colors have already loaded, just dispatch the `route` action
-          // This way, the colors will only be loaded once through the life-cycle
-          // of the application
-          dispatcher.dispatch('route', payload);
-
-        } else {
-
-          // if colors haven't been loaded, show the loading indicator
-          // and send a request to colorApi
-          // once colors are loaded, dispatch the `loaded:colors` action to
-          // process the color data, then dispatch `route` to complete routing
-          // and finally dispatch `loadingIndicator:hide` to hide the loading indicator
-          dispatcher.dispatch('loadingIndicator:show');
-          colorApi.fetch().success(function(data) {
-            dispatcher.dispatch('loaded:colors', {colors:data});
-            dispatcher.dispatch('route', payload);
-            dispatcher.dispatch('loadingIndicator:hide');
-          });
-        }
-      }
-    },
-
-    // goto is only used for internal route changes
-    // this is most likely to happen when a user interaction calls for a URL change
-    goto: function(payload) {
-      payload.pathChangedInternally = true;
-      this._route(payload);
-    },
-
-    // used only for URL stream changes
-    // the URL stream is how we think of direct-URL changes by the user
-    // most commonly, it's these changes are the result of the user clicking the
-    // Back or Forward buttons of the browser
-    routingPathChange: function(payload) {
-      this._route({path:payload.newPath, pathChangedInternally: false});
-    }
-  })
-});
-
 app.run(function($location, $rootScope, $state, actionCreator, routeStore, aboutStore, appStore) {
   window._$location = $location;
 
@@ -128,6 +54,10 @@ app.config(function($locationProvider, $stateProvider) {
     // in the same vein that everything in React is a component.
     // Doing it this way creates more module, easier to re-use code
     // which is easier to test and simpler to reason about.
+    //
+    // Note that we should probably generate these states automatically
+    // by adding the following meta-data to routeStore.routes, but
+    // it's done this way for simplicity's sake.
 
     .state('home', { template: '<home />' })
     .state('about', { template: '<about />' })

@@ -40,9 +40,8 @@ app.factory('routeStore', function(dispatcher, $rootScope, $state, $location) {
 
     }),
 
-    pathMatchesState: function(path, state) {
-      var r = this.router.getRoute(path);
-      return r && r.name === state;
+    getRouteFromPath: function (path) {
+      return this.router.getRoute(path);
     },
 
     'routing:path:change': function(payload) {
