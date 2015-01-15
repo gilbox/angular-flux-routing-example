@@ -41,53 +41,50 @@ then handle routing in our Action Creator [*like a boss*](http://gifstumblr.com/
 
 
     // we define all of our route handling logic here,
-    // these funcitons take the place of ui-router's resolve blocks
-    var routes = {
-      about: function(payload) {
+    // these functions take the place of ui-router's resolve blocks
+    // navigate to home
+    home: function(route) {
 
-        // whenever the 'about' route is loaded, we re-load
-        // the about data with aboutApi.
-        // This probably makes little sense in a real-world application,
-        // but contrast this to how the color data is only loaded one
-        // time in the 'home' route below
+      // If colors have already loaded, just dispatch the `route` action
+      // This way, the colors will only be loaded once through the life-cycle
+      // of the application
 
+      if (! colorStore.colorsLoaded) {
+        // if colors haven't been loaded, show the loading indicator
+        // and send a request to colorApi
+        // once colors are loaded, dispatch the `loaded:colors` action to
+        // process the color data, then dispatch `route` to complete routing
+        // and finally dispatch `loadingIndicator:hide` to hide the loading indicator
         dispatcher.dispatch('loadingIndicator:show');
-
-        aboutApi.fetch().success(function(data) {
-          dispatcher.dispatch('loaded:about', {people: data});
-          dispatcher.dispatch('route', payload);
+        colorApi.fetch().success(function(data) {
+          dispatcher.dispatch('loaded:colors', {colors: data});
+          dispatcher.dispatch('route', {route:route});
           dispatcher.dispatch('loadingIndicator:hide');
         });
 
-      },
-
-      home: function(payload) {
-
-        if (colorStore.colorsLoaded) {
-
-          // If colors have already loaded, just dispatch the `route` action
-          // This way, the colors will only be loaded once through the life-cycle
-          // of the application
-
-          dispatcher.dispatch('route', payload);
-
-        } else {
-
-          // if colors haven't been loaded, show the loading indicator
-          // and send a request to colorApi
-          // once colors are loaded, dispatch the `loaded:colors` action to
-          // process the color data, then dispatch `route` to complete routing
-          // and finally dispatch `loadingIndicator:hide` to hide the loading indicator
-
-          dispatcher.dispatch('loadingIndicator:show');
-          colorApi.fetch().success(function(data) {
-            dispatcher.dispatch('loaded:colors', {colors: data});
-            dispatcher.dispatch('route', payload);
-            dispatcher.dispatch('loadingIndicator:hide');
-          });
-        }
+        return false;
       }
-    };
+    },
+
+    // navigate to about
+    about: function(route) {
+
+      // whenever the 'about' route is loaded, we re-load
+      // the about data with aboutApi.
+      // This probably makes little sense in a real-world application,
+      // but contrast this to how the color data is only loaded one
+      // time in the 'home' route above
+
+      dispatcher.dispatch('loadingIndicator:show');
+
+      aboutApi.fetch().success(function(data) {
+        dispatcher.dispatch('loaded:about', {people: data});
+        dispatcher.dispatch('route', {route:route});
+        dispatcher.dispatch('loadingIndicator:hide');
+      });
+
+      return false;
+    },
 
 now [tell me](https://github.com/gilbox/angular-flux-routing-example/issues)
 you still want to use resolve blocks!?
