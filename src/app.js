@@ -15,7 +15,7 @@ app.run(function($location, $rootScope, $state, actionCreator, routeStore, about
   }, function(newPath, oldPath) {
     if (!routeStore.pathChangedInternally) {
       console.log('URL stream:', newPath);
-      actionCreator.routingPathChange({newPath:newPath, oldPath:oldPath});
+      actionCreator.routingPathChange({path:newPath, oldPath:oldPath});
     }
   });
 
@@ -23,7 +23,7 @@ app.run(function($location, $rootScope, $state, actionCreator, routeStore, about
   // This is how internally-requested route changes (via actionCreator.goto(..))
   // swap out directives which display the various views
   $rootScope.$watch(function() {
-    return routeStore.state;
+    return routeStore.currentRouteName;
   }, function (newState, oldState) {
     console.log('routeStore.state changed:', newState);
     if (newState) $state.go(newState);

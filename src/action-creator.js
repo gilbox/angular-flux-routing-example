@@ -1,38 +1,21 @@
 app.factory('actionCreator', function (dispatcher, colorApi, aboutApi, colorStore, routeStore) {
 
-  // we define all of our route handling logic here,
-  // these funcitons take the place of ui-router's resolve blocks
-  // also see the route function below
-  var routes = {
-    about: function(payload) {
+  // Notice 2 types of methods:
+  //  actionCreator.fn(payload)
+  //  actionCreator.fn(route)
+  //
+  // Don't call methods that accept a route directly,
+  // use actionCreator.goto(payload) instead.
+  return dispatcher.registerActionCreator({
 
-      // whenever the 'about' route is loaded, we re-load
-      // the about data with aboutApi.
-      // This probably makes little sense in a real-world application,
-      // but contrast this to how the color data is only loaded one
-      // time in the 'home' route below
+    // navigate to home
+    home: function(route) {
 
-      dispatcher.dispatch('loadingIndicator:show');
+      // If colors have already loaded, just dispatch the `route` action
+      // This way, the colors will only be loaded once through the life-cycle
+      // of the application
 
-      aboutApi.fetch().success(function(data) {
-        dispatcher.dispatch('loaded:about', {people: data});
-        dispatcher.dispatch('route', payload);
-        dispatcher.dispatch('loadingIndicator:hide');
-      });
-
-    },
-
-    home: function(payload) {
-
-      if (colorStore.colorsLoaded) {
-
-        // If colors have already loaded, just dispatch the `route` action
-        // This way, the colors will only be loaded once through the life-cycle
-        // of the application
-        dispatcher.dispatch('route', payload);
-
-      } else {
-
+      if (! colorStore.colorsLoaded) {
         // if colors haven't been loaded, show the loading indicator
         // and send a request to colorApi
         // once colors are loaded, dispatch the `loaded:colors` action to
@@ -41,24 +24,33 @@ app.factory('actionCreator', function (dispatcher, colorApi, aboutApi, colorStor
         dispatcher.dispatch('loadingIndicator:show');
         colorApi.fetch().success(function(data) {
           dispatcher.dispatch('loaded:colors', {colors: data});
-          dispatcher.dispatch('route', payload);
+          dispatcher.dispatch('route', {route:route});
           dispatcher.dispatch('loadingIndicator:hide');
         });
+
+        return false;
       }
-    }
-  };
+    },
 
-  // This function shouldn't be called directly from the view layer
-  // All of our routing changes go through here,
-  // both internal and stream URL changes (see below)
-  function route(payload) {
-    var route = routeStore.getRouteFromPath(payload.path),
-      path = route && route.name;
+    // navigate to about
+    about: function(route) {
 
-    if (routes[path]) return routes[path](payload);
-  }
+      // whenever the 'about' route is loaded, we re-load
+      // the about data with aboutApi.
+      // This probably makes little sense in a real-world application,
+      // but contrast this to how the color data is only loaded one
+      // time in the 'home' route above
 
-  return dispatcher.registerActionCreator({
+      dispatcher.dispatch('loadingIndicator:show');
+
+      aboutApi.fetch().success(function(data) {
+        dispatcher.dispatch('loaded:about', {people: data});
+        dispatcher.dispatch('route', {route:route});
+        dispatcher.dispatch('loadingIndicator:hide');
+      });
+
+      return false;
+    },
 
     toggleColor: function(payload) {
       dispatcher.dispatch('toggle:color', payload);
@@ -68,11 +60,25 @@ app.factory('actionCreator', function (dispatcher, colorApi, aboutApi, colorStor
       dispatcher.dispatch('toggle:all');
     },
 
+    route: function (payload, isInternal) {
+      payload.pathChangedInternally = isInternal;
+      payload.route = routeStore.getRouteFromPath(payload.path);
+
+      if (payload.route) {
+        var routeName = payload.route.name;
+
+        if (this[routeName] && this[routeName](payload.route) !== false) {
+          dispatcher.dispatch('route', payload);
+        }
+      }
+    },
+
     // goto is only used for internal route changes
     // this is most likely to happen when a user interaction calls for a URL change
+    // The payload passed into this function should have a `routeName` property
+    // which has a corresponding method in this actionCreator that represents a route.
     goto: function(payload) {
-      payload.pathChangedInternally = true;
-      route(payload);
+      this.route(payload, true);
     },
 
     // used only for URL stream changes
@@ -80,7 +86,8 @@ app.factory('actionCreator', function (dispatcher, colorApi, aboutApi, colorStor
     // most commonly, these changes are the result of the user clicking the
     // Back or Forward buttons of the browser
     routingPathChange: function(payload) {
-      route({path:payload.newPath, pathChangedInternally: false});
+      this.route(payload, false);
     }
+
   })
 });

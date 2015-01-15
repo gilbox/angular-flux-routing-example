@@ -3,6 +3,8 @@ angular-flux-routing-example
 
 Achieving Reasonable Scalability in Angular with Flux and Routing
 
+**NOTE: The routing code in this repo has been refactored (to be simpler) since I published the Medium article,
+but the article does not yet have the updated code. The changes mostly effect `action-creator.js` and `stores.js`.**
 
 running
 =======

@@ -22,8 +22,7 @@ app.factory('routeStore', function(dispatcher, $rootScope, $state, $location) {
 
   return dispatcher.registerStore({
     storeName: 'routeStore',
-    state: undefined,
-    path: undefined,
+    currentRoute: undefined,
     pathChangedInternally: undefined,
 
     router: new Router({  // this is routr    https://github.com/yahoo/routr
@@ -44,19 +43,12 @@ app.factory('routeStore', function(dispatcher, $rootScope, $state, $location) {
       return this.router.getRoute(path);
     },
 
-    'routing:path:change': function(payload) {
-      this.path = payload.newPath;
-
-      // @todo: handle error when route doesn't exist
-      this.state = this.router.getRoute(payload.newPath).name;
-    },
-
     'route': function(payload) {
       console.log('route', payload);
 
       // @todo: handle error when route doesn't exist
-      this.state = this.router.getRoute(payload.path).name;
-      this.path = payload.path;
+      this.currentRoute = payload.route;
+      this.currentRouteName = payload.route && payload.route.name;
       this.pathChangedInternally = !! payload.pathChangedInternally;
     }
   });
