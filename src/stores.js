@@ -49,6 +49,7 @@ app.factory('routeStore', function(dispatcher, $rootScope, $state, $location) {
       // @todo: handle error when route doesn't exist
       this.currentRoute = payload.route;
       this.currentRouteName = payload.route && payload.route.name;
+      this.path = payload.route.url;
       this.pathChangedInternally = !! payload.pathChangedInternally;
     }
   });
