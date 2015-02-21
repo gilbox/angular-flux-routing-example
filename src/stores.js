@@ -50,7 +50,8 @@ app.factory('routeStore', function(dispatcher, $rootScope, $state, $location) {
       this.currentRoute = payload.route;
       this.currentRouteName = payload.route && payload.route.name;
       this.path = payload.route.url;
-      this.pathChangedInternally = !! payload.pathChangedInternally;
+
+      $rootScope.$broadcast('routingStateChange', this.currentRouteName);
     }
   });
 });

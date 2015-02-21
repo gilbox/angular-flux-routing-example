@@ -6,25 +6,22 @@ app.run(function($location, $rootScope, $state, actionCreator, routeStore, about
   window._$location = $location;
 
   // Watch the URL path input stream (user-initiated routing changes)
-  // When the user clicks Back or Forward, this is effectively the event handler.
-  // We can differentiate stream from internal URL changes because
-  // all URL changes are routed through actionCreator.goto(..) or actionCreating.routingPathChange(..)
-  // which will decorate the path-carrying payload with the pathChangedInternally property
-  $rootScope.$watch(function() {
-    return $location.path();
-  }, function(newPath, oldPath) {
-    if (!routeStore.pathChangedInternally) {
-      console.log('URL stream:', newPath);
-      actionCreator.routingPathChange({path:newPath, oldPath:oldPath});
-    }
-  });
+  // Ie., when the user clicks Back or Forward.
+  function handlePathChange() {
+    console.log(">>> " + location.pathname + location.search);
+    actionCreator.routingPathChange({path:location.pathname + location.search});
+  }
 
-  // bind to view by watching routeStore.state
+  // setup event listener for back/forward buttons
+  var eventInfo = window.addEventListener ? ['addEventListener', ''] : ['attachEvent', 'on'];
+  window[eventInfo[0]](eventInfo[1] + 'popstate', handlePathChange, false);
+
+  // trigger path change on startup
+  handlePathChange();
+
   // This is how internally-requested route changes (via actionCreator.goto(..))
   // swap out directives which display the various views
-  $rootScope.$watch(function() {
-    return routeStore.currentRouteName;
-  }, function (newState, oldState) {
+  $rootScope.$on('routingStateChange', function (e, newState) {
     console.log('routeStore.state changed:', newState);
     if (newState) $state.go(newState);
   });
